@@ -10,3 +10,6 @@ npm-debug.log*
 
 # O agent e as skills que usei para construir isto. Não é fonte do site.
 .opencode/
+# Fotos de trabalho do celular. As copias que o site usa, ja
+# redimensionadas e renomeadas, ficam em site/public/fotos.
+fotos/
