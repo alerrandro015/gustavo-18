@@ -1,82 +1,24 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
-import { fotos, type Foto } from '../content/fotos'
-
-/**
- * O desenho que ocupa o lugar de cada foto: asfalto, o número da cena e a
- * silhueta do van. Também é o que aparece se a foto real não carregar.
- */
-function Lugar({ indice, alt }: { indice: number; alt: string }) {
-  return (
-    <svg
-      viewBox="0 0 400 300"
-      className="absolute inset-0 size-full"
-      role="img"
-      aria-label={alt}
-      preserveAspectRatio="xMidYMid slice"
-    >
-      <defs>
-        <linearGradient id={`ceu-${indice}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#101013" />
-          <stop offset="60%" stopColor="#0a0a0d" />
-          <stop offset="100%" stopColor="#050506" />
-        </linearGradient>
-        <radialGradient id={`halo-${indice}`} cx="50%" cy="72%" r="46%">
-          <stop offset="0%" stopColor="#ff5a00" stopOpacity="0.5" />
-          <stop offset="100%" stopColor="#ff5a00" stopOpacity="0" />
-        </radialGradient>
-      </defs>
-
-      <rect width="400" height="300" fill={`url(#ceu-${indice})`} />
-      <ellipse cx="200" cy="216" rx="150" ry="70" fill={`url(#halo-${indice})`} />
-
-      {/* Silhueta do van, no mesmo espírito da cena 3D: só a forma importa. */}
-      <g fill="#05050a" opacity="0.92">
-        <rect x="120" y="176" width="160" height="46" rx="14" />
-        <rect x="140" y="140" width="112" height="40" rx="12" />
-        <circle cx="152" cy="226" r="17" />
-        <circle cx="250" cy="226" r="17" />
-      </g>
-
-      {/* Faróis. São os dois únicos pontos claros da cena. */}
-      <circle cx="272" cy="188" r="4.5" fill="#fff2d8" />
-      <circle cx="272" cy="188" r="12" fill="#ffe9c4" opacity="0.22" />
-      <circle cx="288" cy="188" r="4.5" fill="#fff2d8" />
-      <circle cx="288" cy="188" r="12" fill="#ffe9c4" opacity="0.22" />
-
-      <text
-        x="200"
-        y="278"
-        textAnchor="middle"
-        fontFamily="'Anton', sans-serif"
-        fontSize="15"
-        fill="#b8bcc4"
-        opacity="0.5"
-        letterSpacing="3"
-      >
-        {String(indice + 1).padStart(2, '0')}
-      </text>
-    </svg>
-  )
-}
+import { fotos, DESTAQUE, type Foto } from '../content/fotos'
 
 function Quadro({
   foto,
   indice,
+  destaque,
   onAbrir,
 }: {
   foto: Foto
   indice: number
+  destaque: boolean
   onAbrir: () => void
 }) {
   const [falhou, setFalhou] = useState(false)
   const [ondulado, setOndulado] = useState(false)
 
-  const mostraFoto = foto.src && !falhou
-
   return (
     <motion.figure
-      className="group relative aspect-4/3 cursor-zoom-in overflow-hidden border border-branco/10 bg-carbono"
+      className="group relative aspect-3/4 cursor-zoom-in overflow-hidden border border-branco/10 bg-carbono"
       initial={{ opacity: 0, y: 36 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.25 }}
@@ -93,7 +35,11 @@ function Quadro({
           ondulado ? 'seta-som [filter:url(#ondula)]' : ''
         }`}
       >
-        {mostraFoto ? (
+        {falhou ? (
+          <div className="flex size-full items-center justify-center bg-carbono">
+            <span className="font-display text-branco/25 text-sm">{foto.alt}</span>
+          </div>
+        ) : (
           <img
             src={foto.src}
             alt={foto.alt}
@@ -102,8 +48,6 @@ function Quadro({
             onError={() => setFalhou(true)}
             className="size-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
           />
-        ) : (
-          <Lugar indice={indice} alt={foto.alt} />
         )}
       </div>
 
@@ -120,7 +64,14 @@ function Quadro({
       />
 
       <figcaption className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4">
-        <span className="text-pequeno text-branco/85">{foto.alt}</span>
+        <span className="text-pequeno text-branco/85">
+          {destaque && (
+            <span className="mr-2 bg-nitro px-1.5 py-0.5 font-display text-asfalto text-xs">
+              a favorita
+            </span>
+          )}
+          {foto.alt}
+        </span>
         <span className="font-display text-branco/40 text-sm">
           {String(indice + 1).padStart(2, '0')}
         </span>
@@ -165,7 +116,13 @@ export function Galeria() {
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {fotos.map((foto, i) => (
-            <Quadro key={foto.id} foto={foto} indice={i} onAbrir={() => setAberta(i)} />
+            <Quadro
+              key={foto.id}
+              foto={foto}
+              indice={i}
+              destaque={foto.id === DESTAQUE}
+              onAbrir={() => setAberta(i)}
+            />
           ))}
         </div>
       </div>
@@ -182,8 +139,16 @@ export function Galeria() {
             className="relative w-full max-w-4xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative aspect-4/3 w-full overflow-hidden border border-branco/15">
-              <Lugar indice={aberta as number} alt={fotoAberta.alt} />
+            {/* `object-contain` aqui, e não `cover`: em tela cheia o objetivo é
+                ver a foto inteira. Cortar para preencher a moldura seria
+                perder justamente o que a pessoa abriu para ver. */}
+            <div className="relative flex max-h-[76svh] w-full justify-center border border-branco/15">
+              <img
+                src={fotoAberta.srcCheia}
+                alt={fotoAberta.alt}
+                decoding="async"
+                className="max-h-[76svh] w-auto object-contain"
+              />
             </div>
             <figcaption className="mt-4 flex items-center justify-between gap-4">
               <span className="text-corpo text-branco">{fotoAberta.alt}</span>
