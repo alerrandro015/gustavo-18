@@ -1,0 +1,74 @@
+[
+  {
+    "id": "ana",
+    "autor": "Ana",
+    "relacao": "irmã",
+    "texto": "Você foi o primeiro barulho da casa e continua sendo. Só que agora eu escolho o que toca."
+  },
+  {
+    "id": "beto",
+    "autor": "Beto",
+    "relacao": "parceiro de chapa",
+    "texto": "Dezoito anos e você ainda freia tarde. É defeito de fábrica e eu nunca vou reclamar."
+  },
+  {
+    "id": "carla",
+    "autor": "Carla",
+    "relacao": "mãe",
+    "texto": "Eu passei a vida inteira te levantando do chão. Dezoito anos e você ainda acorda assim."
+  },
+  {
+    "id": "diego",
+    "autor": "Diego",
+    "relacao": "colega de trabalho",
+    "texto": "Você chegou no primeiro dia falando do van. Passados os anos, o van está igual."
+  },
+  {
+    "id": "elza",
+    "autor": "Elza",
+    "relacao": "avó",
+    "texto": "Meu neto. Vem comer, que na casa da vó tem rolo de beef e não tem pressa nenhuma."
+  },
+  {
+    "id": "heitor",
+    "autor": "Heitor",
+    "relacao": "melhor amigo",
+    "texto": "A gente cresceu jogando na mesma rua. Continua na mesma rua, só que com van."
+  },
+  {
+    "id": "isa",
+    "autor": "Isa",
+    "relacao": "irmã",
+    "texto": "Parabéns por continuar sendo o meu irmão preferido. Não conta pra ninguém que eu falei."
+  },
+  {
+    "id": "jonas",
+    "autor": "Jonas",
+    "relacao": "tio",
+    "texto": "Você me ensinou a dirigir empurrando o carro. Não foi o método que eu pedi, mas funcionou."
+  },
+  {
+    "id": "lia",
+    "autor": "Lia",
+    "relacao": "prima",
+    "texto": "Cresceu antes de mim e sempre explicou tudo sem me fazer sentir a mais. Isso é raro."
+  },
+  {
+    "id": "nando",
+    "autor": "Nando",
+    "relacao": "vizinho",
+    "texto": "O motor ligava às seis da manhã. Mas a rua sempre ficou limpa. Obrigado por isso."
+  },
+  {
+    "id": "raul",
+    "autor": "Raul",
+    "relacao": "colega de equipe",
+    "texto": "Você não freia, não desvia e não desiste. É uma combinação estranha de qualidades."
+  },
+  {
+    "id": "ze",
+    "autor": "Zé",
+    "relacao": "pai",
+    "texto": "Eu te ensinei a ler o mundo. Você saiu usando quase tudo o que eu passei. Obrigado."
+  }
+]

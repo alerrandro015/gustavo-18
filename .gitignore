@@ -1,0 +1,12 @@
+# Arquivos que não são do site
+.DS_Store
+*.log
+npm-debug.log*
+
+# Editores
+.vscode/*
+!.vscode/extensions.json
+.idea
+
+# O agent e as skills que usei para construir isto. Não é fonte do site.
+.opencode/

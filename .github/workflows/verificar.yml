@@ -1,0 +1,70 @@
+# O repositorio e a raiz do projeto: `STACK.md` mora ao lado de `site/`.
+# Todo passo que roda npm precisa de `working-directory: site`, porque o
+# package.json esta dentro de site/.
+name: verificar
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        working-directory: site
+        run: npm ci
+
+      # Separado do build de propósito: o `build` já roda o typecheck, mas se
+      # ele falhar aqui o erro aparece como falha de build, e a mensagem é
+      # sobre empacotamento. Separado, a causa fica óbvia.
+      - name: Tipos
+        working-directory: site
+        run: npm run typecheck
+
+      - name: Lint
+        working-directory: site
+        run: npm run lint
+
+      - name: Caracteres corrompidos
+        working-directory: site
+        run: python3 scripts/check-corrupcao.py src
+
+      - name: Build
+        working-directory: site
+        run: npm run build
+
+      # O Chromium do runner não tem GPU. Com `--use-gl=swiftshader` a cena 3D
+      # roda em rasterização por software e os testes de DOM continuam
+      # válidos. As auditorias de pixel (shots e van) ficam de fora: sob
+      # software o bloom não produz o mesmo brilho, e um número de brilho
+      # medido no CI seria comparável só com ele mesmo.
+      - name: Auditoria de DOM e estado do palco
+        working-directory: site
+        run: |
+          npx vite preview --port 4173 --host 127.0.0.1 &
+          # Espera pelo servidor sem trazer uma dependência nova só para isso:
+          # tenta ligar na porta até o preview responder.
+          node -e '
+            const net = require("net")
+            let tentativas = 0
+            const tenta = () => {
+              const s = net.connect(4173, "127.0.0.1")
+              s.on("connect", () => { s.end(); process.exit(0) })
+              s.on("error", () => {
+                s.destroy()
+                if (++tentativas > 60) { console.error("preview nao subiu"); process.exit(1) }
+                setTimeout(tenta, 1000)
+              })
+            }
+            tenta()
+          '
+          node scripts/auditar-dom.mjs http://127.0.0.1:4173/
