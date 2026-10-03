@@ -18,6 +18,9 @@ jobs:
         with:
           node-version: 22
           cache: npm
+          # O lock file está em site/, porque é lá que está o package.json.
+          # Sem este caminho o setup-node procura na raiz e falha.
+          cache-dependency-path: site/package-lock.json
 
       - name: Instalar dependencias
         working-directory: site
